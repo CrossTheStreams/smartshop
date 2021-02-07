@@ -82,65 +82,73 @@ number_of_tenants = ENV["TENANTS"].to_i
 puts "Creating seed data for #{number_of_tenants} tenants...".purple
 puts "\n"
 
-number_of_tenants.times do
+number_of_tenants.times do |i|
   store_type = store_types.sample
   store_type => {category:, product_name_faker:, base_price:}
 
   company_name = Faker::Company.name
 
   new_schema_name = company_name.downcase.underscore.scan(/[a-z\s]+/).first.gsub("\s", "_")
-   puts "Creating postgres schema => #{new_schema_name.red} for #{company_name.yellow}"
-
+  puts "Creating postgres #{"schema".red} => #{new_schema_name} for #{company_name.blue}"
   
-  Smartshop::MultiTenancy.create_schema(new_schema_name)
-  Smartshop::MultiTenancy.with_schema(new_schema_name) do
-    Smartshop::MultiTenancy.copy_public_schema_to_new_schema(new_schema_name)
-    company = Company.create!(name: "#{company_name} #{category}")
-  
-    puts "    Created #{"Company".blue} => #{company.name}"
-    puts "\n"
-  
-    100.times do
-      name = product_name_faker.call
-      description = Faker::Lorem.paragraph(sentence_count: 3)
-      invoice_price = invoice_price(base_price)
-      msrp_price = (invoice_price + invoice_price * 0.03)
-      retail_price = (invoice_price + invoice_price * 0.05)
-  
-      product = Product.create!(
-        name: name,
-        description: description,
-        invoice_price: invoice_price,
-        msrp_price: msrp_price,
-        retail_price: retail_price,
-        current_stock: rand(0..30),
-        uuid: SecureRandom.uuid,
-        company: company,
-      )
-      puts "        Created #{"Product".yellow} with name => #{product.name}"
-    end
-    puts "\n"
-  
-    3.times do
-      first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
-      email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
-      user = User.create!(
-        email: email,
-        first_name: first_name,
-        last_name: last_name,
-        company: company,
-        schema_name: new_schema_name,
-        password: "secretpassword",
-      )
-      puts "        Created #{"User".green} with email => #{user.email}"
-
-      Smartshop::MultiTenancy.with_schema("public") do
-        lookup_user = LookupUser.create!(
-          email: email,
-          schema_name: new_schema_name,
+  # Let's create the last tenant on the remote shard
+  shard = (i == number_of_tenants - 1) ? :remote : :primary
+  ActiveRecord::Base.connected_to(role: :writing, shard: shard) do
+    Smartshop::MultiTenancy.create_schema(new_schema_name)
+    Smartshop::MultiTenancy.with_schema(new_schema_name) do
+      Smartshop::MultiTenancy.copy_public_schema_to_new_schema(new_schema_name)
+      company = Company.create!(name: "#{company_name} #{category}")
+    
+      puts "    Created #{"Company".blue} => #{company.name}"
+      puts "\n"
+    
+      100.times do
+        name = product_name_faker.call
+        description = Faker::Lorem.paragraph(sentence_count: 3)
+        invoice_price = invoice_price(base_price)
+        msrp_price = (invoice_price + invoice_price * 0.03)
+        retail_price = (invoice_price + invoice_price * 0.05)
+    
+        product = Product.create!(
+          name: name,
+          description: description,
+          invoice_price: invoice_price,
+          msrp_price: msrp_price,
+          retail_price: retail_price,
+          current_stock: rand(0..30),
+          uuid: SecureRandom.uuid,
+          company: company,
         )
+        puts "        Created #{"Product".yellow} with name => #{product.name}"
       end
+      puts "\n"
+    
+      3.times do
+        first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
+        email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
+        user = User.create!(
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+          company: company,
+          schema_name: new_schema_name,
+          password: "secretpassword",
+        )
+        puts "        Created #{"User".green} with email => #{user.email}"
+
+        ActiveRecord::Base.connected_to(role: :writing, shard: :primary) do
+          Smartshop::MultiTenancy.with_schema("public") do
+            lookup_user = LookupUser.create!(
+              email: email,
+              schema_name: new_schema_name,
+            )
+          end
+        end
+      end
+      puts "\n"
     end
-    puts "\n"
+  end
+  if shard == :remote
+    Smartshop::MultiTenancy.import_remote_schema(new_schema_name, "smartshop_development_remote")
   end
 end

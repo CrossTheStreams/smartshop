@@ -43,5 +43,16 @@ module Smartshop
       connection.execute(new_schema_dump)
     end
 
+    def self.import_remote_schema(schema_name, remote_server_name)
+      # Create the local schema
+      create_schema(schema_name)
+      sql = %{
+        IMPORT FOREIGN SCHEMA #{schema_name}
+        FROM SERVER #{remote_server_name}
+        INTO #{schema_name};
+      }
+      connection.execute(sql)
+    end
+
   end
 end

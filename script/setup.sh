@@ -1,5 +1,9 @@
 #!/bin/sh
 
 bin/rake db:create
+
+psql -f ./script/create_remote_server.sql --dbname=smartshop_development
+
 bin/rake db:migrate
-bin/rake db:seed TENANTS=3
+git checkout -- db/structure.sql
+bin/rake db:seed TENANTS=5

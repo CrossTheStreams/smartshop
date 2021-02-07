@@ -10,9 +10,6 @@ class Users::SessionsController < Devise::SessionsController
 
   # POST /resource/sign_in
   def create
-    # lookup_user = LookupUser.where(:email => warden_conditions[:email]).first
-    # user_schema = lookup_user.schema_name
-    # Smartshop::MultiTenancy.with_schema(user_schema) d
     self.resource = warden.authenticate!(auth_options)
     session[:schema] = resource.schema_name
     set_flash_message!(:notice, :signed_in)
