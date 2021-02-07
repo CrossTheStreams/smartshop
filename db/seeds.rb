@@ -79,6 +79,7 @@ store_types = [
 number_of_tenants = ENV["TENANTS"].to_i
 
 puts "Creating seed data for #{number_of_tenants} tenants...".purple
+puts "\n"
 
 number_of_tenants.times do
   store_type = store_types.sample
@@ -86,19 +87,7 @@ number_of_tenants.times do
   company_name = Faker::Company.name
   company = Company.create!(name: "#{company_name} #{category}")
   puts "    Created #{"Company".blue} => #{company.name}"
-
-  3.times do
-    first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
-    email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
-    user = User.create!(
-      email: email,
-      first_name: first_name,
-      last_name: last_name,
-      company: company,
-      password: "secretpassword",
-    )
-    puts "        Created #{"User".green} with email => #{user.email}"
-  end
+  puts "\n"
 
   100.times do
     name = product_name_faker.call
@@ -117,6 +106,21 @@ number_of_tenants.times do
       uuid: SecureRandom.uuid,
       company: company,
     )
-    puts "            Created #{"Product".yellow} with name => #{product.name}"
+    puts "        Created #{"Product".yellow} with name => #{product.name}"
   end
+  puts "\n"
+
+  3.times do
+    first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
+    email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
+    user = User.create!(
+      email: email,
+      first_name: first_name,
+      last_name: last_name,
+      company: company,
+      password: "secretpassword",
+    )
+    puts "        Created #{"User".green} with email => #{user.email}"
+  end
+  puts "\n"
 end
