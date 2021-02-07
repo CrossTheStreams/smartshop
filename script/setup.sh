@@ -2,4 +2,4 @@
 
 bin/rake db:create
 bin/rake db:migrate
-bin/rake db:seed TENANTS=5
+bin/rake db:seed TENANTS=3

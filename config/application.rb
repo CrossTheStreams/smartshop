@@ -11,6 +11,7 @@ module Smartshop
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
     config.active_record.schema_format = :sql
+    config.autoload_paths << config.root.join('lib')
 
     # Configuration for the application, engines, and railties goes here.
     #

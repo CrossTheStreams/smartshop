@@ -7,7 +7,11 @@ class User < ApplicationRecord
   devise :database_authenticatable, :recoverable, :rememberable, :validatable
 
   def self.find_for_authentication(warden_conditions)
-    where(:email => warden_conditions[:email]).first
+    lookup_user = LookupUser.where(:email => warden_conditions[:email]).first
+    user_schema = lookup_user.schema_name
+    Smartshop::MultiTenancy.with_schema(user_schema) do
+      where(:email => warden_conditions[:email]).first
+    end
   end
 
 end
