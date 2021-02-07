@@ -75,14 +75,6 @@ store_types = [
     :base_price => 10,
   },
 ]
-=begin
-CREATE TABLE accounts (manager text, company text, contact_email text);
-
-ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY account_managers ON accounts TO managers
-    USING (manager = current_user);
-=end
 
 Company.transaction do
   number_of_tenants = ENV["TENANTS"].to_i
@@ -99,21 +91,6 @@ Company.transaction do
       db_user: company_db_user_name,
     )
     puts "    Created #{"Company".blue} => #{company.name}"
-    puts "\n"
-
-    3.times do
-      first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
-      email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
-      user = User.create!(
-        email: email,
-        first_name: first_name,
-        last_name: last_name,
-        company: company,
-        password: "secretpassword",
-        db_user: company_db_user_name,
-      )
-      puts "        Created #{"User".green} with email => #{user.email}"
-    end
     puts "\n"
 
     100.times do
@@ -136,5 +113,21 @@ Company.transaction do
       )
       puts "        Created #{"Product".yellow} with name => #{product.name}"
     end
+    puts "\n"
+
+    3.times do
+      first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
+      email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
+      user = User.create!(
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        company: company,
+        password: "secretpassword",
+        db_user: company_db_user_name,
+      )
+      puts "        Created #{"User".green} with email => #{user.email}"
+    end
+    puts "\n"
   end
 end
