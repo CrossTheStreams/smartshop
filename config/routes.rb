@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   root to: "home#index"
 
+  get '/products' => "products#index", :as => :user_root
+
   devise_for :users, controllers: {
     sessions: 'users/sessions'
   }

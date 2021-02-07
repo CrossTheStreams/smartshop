@@ -1,0 +1,49 @@
+    <%
+=begin%>
+ create_table :products do |t|
+      t.string :name, null: false
+      t.text :description, null: false, default: ""
+      t.numeric :invoice_price, null: false
+      t.numeric :msrp_price, null: false
+      t.numeric :retail_price, null: false
+      t.integer :current_stock, null: false, default: 0
+      t.string :uuid, null: false
+      t.integer :company_id, null: false
+      t.timestamps
+    end 
+<%
+=end%>
+<table class="table">
+  <thead>
+    <tr>
+      <th><abbr title="Product Name">Name</abbr></th>
+      <th><abbr title="Invoice Price"></abbr>Invoice</th>
+      <th><abbr title="MSRP Price"></abbr>MSRP</th>
+      <th><abbr title="Retail Price"></abbr>Retail</th>
+      <th><abbr title="Current Stock"></abbr>Current Stock</th>
+      <th><abbr title="UUID"></abbr>UUID</th>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <th><abbr title="Product Name">Name</abbr></th>
+      <th><abbr title="Invoice Price"></abbr>Invoice</th>
+      <th><abbr title="MSRP Price"></abbr>MSRP</th>
+      <th><abbr title="Retail Price"></abbr>Retail</th>
+      <th><abbr title="Current Stock"></abbr>Current Stock</th>
+      <th><abbr title="UUID"></abbr>UUID</th>
+    </tr>
+  </tfoot>
+  <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <th><%= product.name %></th>
+        <td><%= usd(product.invoice_price) %></td>
+        <td><%= usd(product.msrp_price) %></td>
+        <td><%= usd(product.retail_price) %></td>
+        <td><%= product.current_stock %></td>
+        <td><%= product.uuid %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

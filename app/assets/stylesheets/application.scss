@@ -13,3 +13,36 @@
  *= require_tree .
  *= require_self
  */
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.company_name_container {
+  margin-right: 10px;
+  .company_name {
+    float: right;
+    line-height: 34px;
+    margin-left: 10px;
+  }
+}
+
+.silouhette {
+  margin-right: 8px;
+}
+.smartshop_label_container {
+  display: block;
+  .navbar-item {
+    display: block !important;
+  }
+}
+
+.smartshop_label {
+  font-size: 14px;
+  font-weight: normal;
+  text-align: center;
+}
+
+.user_avatar {
+  cursor: pointer;
+}

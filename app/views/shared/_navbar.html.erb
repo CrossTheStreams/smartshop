@@ -1,9 +1,30 @@
 <nav class="navbar is-spaced" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="/">
-       💸📊 Smartshop
-    </a>
-
+    <% if user_signed_in? %>
+      <div class="smartshop_label_container">
+        <a class="navbar-item" href="/">
+          <div class="company_name_container">
+            <img width="28px" src="/company_silouhette.png" />
+            <div class="company_name">
+            <b><%= current_company.name %></b>
+            </div>
+          </div>
+          <div class="smartshop_label">
+            <div>Powered By</div>
+            <div>
+              📊 Smartshop
+            </div>
+          </div>
+        </a>
+      </div>
+    <% else %>
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <div>
+            📊 Smartshop
+          </div>
+        </a>
+      </div>
+    <% end %>
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
@@ -14,38 +35,67 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
       <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          Products
-        </a>
-
-        <div class="navbar-dropdown">
+        <% if user_signed_in? %>
           <a class="navbar-item">
-            Thing 1
+            Inventory
           </a>
+          <a class="navbar-link">
+            Reports
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              Thing 1
+            </a>
+            <a class="navbar-item">
+              Thing 2
+            </a>
+            <a class="navbar-item">
+              Thing 3
+            </a>
+          </div>
+        <% else %>
+          <a class="navbar-link">
+            Products
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              Thing 1
+            </a>
+            <a class="navbar-item">
+              Thing 2
+            </a>
+            <a class="navbar-item">
+              Thing 3
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              Report an issue
+            </a>
+          </div>
           <a class="navbar-item">
-            Thing 2
+            About Us
           </a>
-          <a class="navbar-item">
-            Thing 3
-          </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item">
-            Report an issue
-          </a>
-        </div>
+        <% end %>
       </div>
 
-      <a class="navbar-item">
-        About Us
-      </a>
+
     </div>
 
     <div class="navbar-end">
+      <% if user_signed_in? %>
+        <div class="navbar-item user_avatar">
+          <%= user_name_and_avatar(current_user) %>
+        </div>
+      <% end %>
       <div class="navbar-item">
         <div class="buttons">
+        <% if user_signed_in? %>
+          <%= link_to "Sign Out", destroy_user_session_path, class: "button is-link", method: "delete" %>
+        <% else %>
           <a class="button is-link" href="/users/sign_in">
             Log in
           </a>
+        <% end %>
         </div>
       </div>
     </div>
