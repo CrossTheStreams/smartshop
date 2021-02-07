@@ -32,6 +32,7 @@ CREATE TABLE public.ar_internal_metadata (
 CREATE TABLE public.companies (
     id bigint NOT NULL,
     name character varying NOT NULL,
+    db_user character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -70,6 +71,7 @@ CREATE TABLE public.products (
     current_stock integer DEFAULT 0 NOT NULL,
     uuid character varying NOT NULL,
     company_id integer NOT NULL,
+    db_user text NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -114,6 +116,7 @@ CREATE TABLE public.users (
     first_name character varying DEFAULT ''::character varying NOT NULL,
     last_name character varying DEFAULT ''::character varying NOT NULL,
     encrypted_password character varying DEFAULT ''::character varying NOT NULL,
+    db_user text NOT NULL,
     reset_password_token character varying,
     reset_password_sent_at timestamp without time zone,
     remember_created_at timestamp without time zone,
@@ -203,6 +206,13 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: index_companies_on_db_user; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_companies_on_db_user ON public.companies USING btree (db_user);
+
+
+--
 -- Name: index_companies_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -229,6 +239,45 @@ CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING bt
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT fk_rails_7682a3bdfe FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE RESTRICT;
+
+
+--
+-- Name: companies; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: companies companies_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY companies_policy ON public.companies USING (((db_user)::text = CURRENT_USER)) WITH CHECK (((db_user)::text = CURRENT_USER));
+
+
+--
+-- Name: products product_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_policy ON public.products USING ((db_user = CURRENT_USER)) WITH CHECK ((db_user = CURRENT_USER));
+
+
+--
+-- Name: products; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users users_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY users_policy ON public.users USING ((db_user = CURRENT_USER)) WITH CHECK ((db_user = CURRENT_USER));
 
 
 --

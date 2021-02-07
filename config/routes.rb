@@ -3,6 +3,10 @@ Rails.application.routes.draw do
 
   get '/products' => "products#index", :as => :user_root
 
+  devise_scope :user do 
+    get '/users/sign_out' => "users/sessions#destroy"
+  end
+
   devise_for :users, controllers: {
     sessions: 'users/sessions'
   }

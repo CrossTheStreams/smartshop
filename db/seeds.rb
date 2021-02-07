@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 # Grouping of Faker classes that made some sense to group together
-
+Warning[:experimental] = false
 require 'awesome_print'
 require 'faker'
 require 'pry-rails'
@@ -75,48 +75,66 @@ store_types = [
     :base_price => 10,
   },
 ]
+=begin
+CREATE TABLE accounts (manager text, company text, contact_email text);
 
-number_of_tenants = ENV["TENANTS"].to_i
+ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
 
-puts "Creating seed data for #{number_of_tenants} tenants...".purple
+CREATE POLICY account_managers ON accounts TO managers
+    USING (manager = current_user);
+=end
 
-number_of_tenants.times do
-  store_type = store_types.sample
-  store_type => {category:, product_name_faker:, base_price:}
-  company_name = Faker::Company.name
-  company = Company.create!(name: "#{company_name} #{category}")
-  puts "    Created #{"Company".blue} => #{company.name}"
+Company.transaction do
+  number_of_tenants = ENV["TENANTS"].to_i
+  puts "Creating seed data for #{number_of_tenants} tenants...".purple
 
-  3.times do
-    first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
-    email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
-    user = User.create!(
-      email: email,
-      first_name: first_name,
-      last_name: last_name,
-      company: company,
-      password: "secretpassword",
+  number_of_tenants.times do
+    puts "\n"
+    store_type = store_types.sample
+    store_type => {category:, product_name_faker:, base_price:}
+    company_name = Faker::Company.unique.name
+    company_db_user_name = company_name.downcase.underscore.scan(/[a-z\s]+/).first.gsub("\s", "_")
+    company = Company.create!(
+      name: "#{company_name} #{category}",
+      db_user: company_db_user_name,
     )
-    puts "        Created #{"User".green} with email => #{user.email}"
-  end
+    puts "    Created #{"Company".blue} => #{company.name}"
+    puts "\n"
 
-  100.times do
-    name = product_name_faker.call
-    description = Faker::Lorem.paragraph(sentence_count: 3)
-    invoice_price = invoice_price(base_price)
-    msrp_price = (invoice_price + invoice_price * 0.03)
-    retail_price = (invoice_price + invoice_price * 0.05)
+    3.times do
+      first_name, last_name = Faker::FunnyName.unique.two_word_name.split(" ")
+      email = "#{first_name.downcase}.#{last_name.downcase}@example.com"
+      user = User.create!(
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        company: company,
+        password: "secretpassword",
+        db_user: company_db_user_name,
+      )
+      puts "        Created #{"User".green} with email => #{user.email}"
+    end
+    puts "\n"
 
-    product = Product.create!(
-      name: name,
-      description: description,
-      invoice_price: invoice_price,
-      msrp_price: msrp_price,
-      retail_price: retail_price,
-      current_stock: rand(0..30),
-      uuid: SecureRandom.uuid,
-      company: company,
-    )
-    puts "            Created #{"Product".yellow} with name => #{product.name}"
+    100.times do
+      name = product_name_faker.call
+      description = Faker::Lorem.paragraph(sentence_count: 3)
+      invoice_price = invoice_price(base_price)
+      msrp_price = (invoice_price + invoice_price * 0.03)
+      retail_price = (invoice_price + invoice_price * 0.05)
+
+      product = Product.create!(
+        name: name,
+        description: description,
+        invoice_price: invoice_price,
+        msrp_price: msrp_price,
+        retail_price: retail_price,
+        current_stock: rand(0..30),
+        uuid: SecureRandom.uuid,
+        company: company,
+        db_user: company_db_user_name
+      )
+      puts "        Created #{"Product".yellow} with name => #{product.name}"
+    end
   end
 end

@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
 
   def index
-    @products = current_user.company.products
+    @products = Product.all
     render :index
   end
 

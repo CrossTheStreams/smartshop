@@ -9,6 +9,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.1]
       t.string :first_name,          null: false, default: ""
       t.string :last_name,           null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
+      t.text :db_user, null: false
 
       ## Recoverable
       t.string   :reset_password_token
@@ -42,5 +43,13 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.1]
     add_index :users, :reset_password_token, unique: true
     # add_index :users, :confirmation_token,   unique: true
     # add_index :users, :unlock_token,         unique: true
+
+    ActiveRecord::Base.connection.execute("
+      ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+      CREATE POLICY users_policy ON users 
+        USING (users.db_user = current_user)
+        WITH CHECK (users.db_user = current_user);
+      GRANT SELECT, INSERT, UPDATE, DELETE on users TO public;
+    ")
   end
 end
