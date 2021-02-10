@@ -3,10 +3,12 @@
 ## Intro
 
 This repo features different approaches to building a multi-tenant application, using
-Ruby on Rails 6.1 and PostgreSQL 13. The theme here is an app to track the inventory of a
+Ruby on Rails 6.1 and PostgreSQL 13. The theme here is an app ("Smartshop") to track the inventory of a
 store.
 
-In each approach to multi-tenancy, you'll be able to generate seed data for each tenant, log in as a user in one of the tenants (with authentication using the Devise gem), and view a list of products particular to the tenant.
+In each approach to multi-tenancy, you'll be able to generate seed data for each tenant, log in as a user in one of the tenants (with authentication using the Devise gem), and view a list of products particular to the tenant (each tenants will have 100 "products", themed for their particular shop).
+
+NOTE: This repo is NOT focused on demonstrating or being an example of any sort of *conventional* approach to some of these. I'm not using the Apartment or acts_as_tenant gems, for instance. Instead, this is just an extremely lightweight demonstation of these different approaches to multi-tenancy.
 
 ## Setup
 
