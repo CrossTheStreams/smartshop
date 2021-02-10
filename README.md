@@ -12,7 +12,7 @@ NOTE: This repo is NOT focused on demonstrating or being an example of any sort 
 
 ## Setup
 
-To setup the application up:
+To setup the application:
 
 1. Install a ruby version manager, like [rbenv](https://github.com/rbenv/rbenv#installation).
 2. Install Ruby 3.0.0: `$ rbenv install 3.0.0`.
