@@ -30,7 +30,7 @@ Below is a description of each feature branch, and the approach(es) to multi-ten
 
 ## Feature branches
 
-### `master` branch : "Siloed" multi-tenancy and simple "Pool" multi-tenancy
+### `main` branch : "Siloed" multi-tenancy and simple "Pool" multi-tenancy
 
 If you'd like to try a "Siloed" approach to multi-tenancy, this could be demonstrated by:
 
